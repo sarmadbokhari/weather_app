@@ -8,7 +8,7 @@
   <meta name="author" content="">
   <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-  <title>Austin Weather</title>
+  <title>Weather App</title>
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 
@@ -23,14 +23,13 @@
 
 <body>
 
-<div class="container">
+<div class="container" >
 
   <div class="jumbotron">
     <h1>Austin Weather</h1>
     <canvas id="icon1" width="128" height="128"></canvas>
-
     <div class="weather-forecast">
-      <div class="day">
+      <div class="day" id="replace">
         <h3>Today</h3>
         <dl class="day dl-horizontal">
           <dt>Humidity:</dt>
@@ -48,41 +47,59 @@
     </div>
 
     <p id="get-weather"><a class="btn btn-lg btn-success" href="#" role="button">Get Weather</a></p>
-  </div>
 
-  <div class="footer">
-    <p>&copy; TheWeatherMan 2014</p>
-  </div>
 
 </div> <!-- /container -->
 
+<script type="text/template" id="temp">
+   <h3>Today</h3>
+    <dl class="day dl-horizontal">
+      <dt>Humidity:</dt>
+      <dd id="humidity">{{humidity}}</dd>
+      <dt>Pressure:</dt>
+      <dd id="pressure">{{pressure}}</dd>
+      <dt>Temperature:</dt>
+      <dd id="temperature">{{temp}}</dd>
+      <dt>High:</dt>
+      <dd id="high">{{temp_max}}</dd>
+      <dt>Low:</dt>
+      <dd id="low">{{temp_min}}</dd>
+    </dl>
+</script>
 
 <!-- Placed at the end of the document so the pages load faster -->
+<script src="robin.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://learn.themakersquare.com/materials/vendor/jquery.riot.js"></script>
 <script src="http://learn.themakersquare.com/materials/week-7/weather-icons.js"></script>
 <script type="text/javascript">
 
+  var template = $('#temp').html()
+
   var weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Austin&mode=json&units=imperial";
 
   $.get(weatherUrl, function(data){
+
     $("#get-weather").on('click', function (e) {
+    $('#replace').html(Robin.render(template, data.main));
     e.preventDefault();
     console.log('Fetching weather...');
+    console.log(data);
 
-    $("#humidity").text(data.main.humidity);
-    $("#pressure").text(data.main.pressure);
-    $("#temperature").text(data.main.temp + "°");
-    $("#high").text(data.main.temp_max + "°");
-    $("#low").text(data.main.temp_min + "°");
+    // $("#humidity").text(data.main.humidity);
+    // $("#pressure").text(data.main.pressure);
+    // $("#temperature").text(data.main.temp + "°");
+    // $("#high").text(data.main.temp_max + "°");
+    // $("#low").text(data.main.temp_min + "°");
 
     var skycons = new Skycons({"color": "black"});
+    skycons.play();
 
     // Skycons: http://darkskyapp.github.io/skycons/
     if (data.weather[0].main === "Clear"){
       skycons.add("icon1", Skycons.CLEAR_DAY)
-    } else if (data.weather[0].main === "Cloudy"){
-      skycons.add("icon1", Skycons.CLOUDY)
+    } else if (data.weather[0].main === "Clouds"){
+      skycons.add("icon1", Skycons.PARTLY_CLOUDY_DAY)
     } else if (data.weather[0].main === "Fog"){
       skycons.add("icon1", Skycons.FOG)
     } else if (data.weather[0].main === "Rain"){
@@ -95,7 +112,6 @@
   });
 
   });
-
 
 
 
