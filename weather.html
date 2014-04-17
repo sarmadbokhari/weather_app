@@ -29,24 +29,41 @@
     <h1>Austin Weather</h1>
     <canvas id="icon1" width="128" height="128"></canvas>
     <div class="weather-forecast">
-      <div class="day" id="replace">
+      <div class="day" id="replace_today">
         <h3>Today</h3>
         <dl class="day dl-horizontal">
-          <dt>Humidity:</dt>
-          <dd id="humidity"></dd>
-          <dt>Pressure:</dt>
-          <dd id="pressure"></dd>
           <dt>Temperature:</dt>
           <dd id="temperature"></dd>
           <dt>High:</dt>
           <dd id="high"></dd>
           <dt>Low:</dt>
           <dd id="low"></dd>
+          <dt>Humidity:</dt>
+          <dd id="humidity"></dd>
+          <dt>Pressure:</dt>
+          <dd id="pressure"></dd>
         </dl>
       </div>
     </div>
 
-    <p id="get-weather"><a class="btn btn-lg btn-success" href="#" role="button">Get Weather</a></p>
+    <p id="get-weather"><a class="btn btn-lg btn-success" href="#" role="button">Get Today's Weather</a></p>
+
+    <canvas id="icon1" width="64" height="64"></canvas>
+    <div class="weather-forecast">
+      <div class="day" id="replace_tomorrow">
+        <h3>Tomorrow</h3>
+        <dl class="day dl-horizontal">
+          <dt>Temperature:</dt>
+          <dd id="temperature"></dd>
+          <dt>Morning:</dt>
+          <dd id="morning"></dd>
+          <dt>Evening:</dt>
+          <dd id="evening"></dd>
+        </dl>
+      </div>
+    </div>
+
+    <p id="get-weather-tomorrow"><a class="btn btn-lg btn-success" href="#" role="button">Get Tomorrow's Forecast</a></p>
 
 
 </div> <!-- /container -->
@@ -54,16 +71,28 @@
 <script type="text/template" id="temp">
    <h3>Today</h3>
     <dl class="day dl-horizontal">
-      <dt>Humidity:</dt>
-      <dd id="humidity">{{humidity}}</dd>
-      <dt>Pressure:</dt>
-      <dd id="pressure">{{pressure}}</dd>
       <dt>Temperature:</dt>
       <dd id="temperature">{{temp}}</dd>
       <dt>High:</dt>
       <dd id="high">{{temp_max}}</dd>
       <dt>Low:</dt>
       <dd id="low">{{temp_min}}</dd>
+      <dt>Humidity:</dt>
+      <dd id="humidity">{{humidity}}</dd>
+      <dt>Pressure:</dt>
+      <dd id="pressure">{{pressure}}</dd>
+    </dl>
+</script>
+
+<script type="text/template" id="forecast_tomorrow">
+   <h3>Tomorrow</h3>
+    <dl class="day dl-horizontal">
+      <dt>Temperature:</dt>
+      <dd id="temperature">{{day}}</dd>
+      <dt>High:</dt>
+      <dd id="morning">{{morn}}</dd>
+      <dt>Low:</dt>
+      <dd id="evening">{{eve}}</dd>
     </dl>
 </script>
 
@@ -74,6 +103,8 @@
 <script src="http://learn.themakersquare.com/materials/week-7/weather-icons.js"></script>
 <script type="text/javascript">
 
+  // TODAY
+
   var template = $('#temp').html()
 
   var weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Austin&mode=json&units=imperial";
@@ -81,35 +112,70 @@
   $.get(weatherUrl, function(data){
 
     $("#get-weather").on('click', function (e) {
-    $('#replace').html(Robin.render(template, data.main));
-    e.preventDefault();
-    console.log('Fetching weather...');
-    console.log(data);
+      $('#replace_today').html(Robin.render(template, data.main));
+      e.preventDefault();
+      console.log('Fetching weather...');
+      console.log(data);
 
-    // $("#humidity").text(data.main.humidity);
-    // $("#pressure").text(data.main.pressure);
-    // $("#temperature").text(data.main.temp + "°");
-    // $("#high").text(data.main.temp_max + "°");
-    // $("#low").text(data.main.temp_min + "°");
+      // $("#humidity").text(data.main.humidity);
+      // $("#pressure").text(data.main.pressure);
+      // $("#temperature").text(data.main.temp + "°");
+      // $("#high").text(data.main.temp_max + "°");
+      // $("#low").text(data.main.temp_min + "°");
 
-    var skycons = new Skycons({"color": "black"});
-    skycons.play();
+      var skycons = new Skycons({"color": "black"});
+      skycons.play();
 
-    // Skycons: http://darkskyapp.github.io/skycons/
-    if (data.weather[0].main === "Clear"){
-      skycons.add("icon1", Skycons.CLEAR_DAY)
-    } else if (data.weather[0].main === "Clouds"){
-      skycons.add("icon1", Skycons.PARTLY_CLOUDY_DAY)
-    } else if (data.weather[0].main === "Fog"){
-      skycons.add("icon1", Skycons.FOG)
-    } else if (data.weather[0].main === "Rain"){
-      skycons.add("icon1", Skycons.RAIN)
-    } else if (data.weather[0].main === "Snow"){
-      skycons.add("icon1", Skycons.SNOW)
-    } else if (data.weather[0].main === "Wind"){
-      skycons.add("icon1", Skycons.WIND)
-    }
+      // Skycons: http://darkskyapp.github.io/skycons/
+      if (data.weather[0].main === "Clear"){
+        skycons.add("icon1", Skycons.CLEAR_DAY)
+      } else if (data.weather[0].main === "Clouds"){
+        skycons.add("icon1", Skycons.PARTLY_CLOUDY_DAY)
+      } else if (data.weather[0].main === "Fog"){
+        skycons.add("icon1", Skycons.FOG)
+      } else if (data.weather[0].main === "Rain"){
+        skycons.add("icon1", Skycons.RAIN)
+      } else if (data.weather[0].main === "Snow"){
+        skycons.add("icon1", Skycons.SNOW)
+      } else if (data.weather[0].main === "Wind"){
+        skycons.add("icon1", Skycons.WIND)
+      }
+    });
+
   });
+
+  // FORECAST
+
+  var temp_forecast = $('#forecast_tomorrow').html()
+
+  var forecastUrl = "http://api.openweathermap.org/data/2.5/forecast/daily?q=Austin&mode=json&units=imperial&cnt=3";
+
+  $.get(forecastUrl, function(data){
+
+    $("#get-weather-tomorrow").on('click', function (e) {
+      $('#replace_tomorrow').html(Robin.render(temp_forecast, data.list[0].temp.day));
+      e.preventDefault();
+      console.log('Fetching weather...');
+      console.log(data);
+
+      var skycons = new Skycons({"color": "black"});
+      skycons.play();
+
+      // Skycons: http://darkskyapp.github.io/skycons/
+      if (data.list[0].weather.main === "Clear"){
+        skycons.add("icon1", Skycons.CLEAR_DAY)
+      } else if (data.list[0].weather.main === "Clouds"){
+        skycons.add("icon1", Skycons.PARTLY_CLOUDY_DAY)
+      } else if (data.list[0].weather.main === "Fog"){
+        skycons.add("icon1", Skycons.FOG)
+      } else if (data.list[0].weather.main === "Rain"){
+        skycons.add("icon1", Skycons.RAIN)
+      } else if (data.list[0].weather.main === "Snow"){
+        skycons.add("icon1", Skycons.SNOW)
+      } else if (data.list[0].weather.main === "Wind"){
+        skycons.add("icon1", Skycons.WIND)
+      }
+    });
 
   });
 
